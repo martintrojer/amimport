@@ -1,0 +1,454 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000001 /* AMImportApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* AMImportApp.swift */; };
+		A00000000000000000000002 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* RootView.swift */; };
+		A00000000000000000000003 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* Models.swift */; };
+		A00000000000000000000004 /* MatchScoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000104 /* MatchScoring.swift */; };
+		A00000000000000000000005 /* MatchingOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000105 /* MatchingOptions.swift */; };
+		A00000000000000000000006 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000106 /* CSVImporter.swift */; };
+		A00000000000000000000007 /* MusicAuthorizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000107 /* MusicAuthorizationService.swift */; };
+		A00000000000000000000008 /* AMImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000108 /* AMImportTests.swift */; };
+		A00000000000000000000009 /* CSVParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000109 /* CSVParserTests.swift */; };
+		A0000000000000000000000A /* TrackNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000010A /* TrackNormalizerTests.swift */; };
+		A0000000000000000000000B /* MusicAuthorizationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000010B /* MusicAuthorizationServiceTests.swift */; };
+		A0000000000000000000000C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A00000000000000000000120 /* XCTest.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A00000000000000000000201 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000300 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A00000000000000000000400;
+			remoteInfo = AMImport;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000101 /* AMImportApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/App/AMImportApp.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000102 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/App/RootView.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000103 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Domain/Models.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000104 /* MatchScoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Domain/MatchScoring.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000105 /* MatchingOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Domain/MatchingOptions.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000106 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Services/Importers/CSVImporter.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000107 /* MusicAuthorizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Services/MusicAuthorizationService.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000108 /* AMImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/AMImportTests.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000109 /* CSVParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Domain/CSVParserTests.swift; sourceTree = SOURCE_ROOT; };
+		A0000000000000000000010A /* TrackNormalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Domain/TrackNormalizerTests.swift; sourceTree = SOURCE_ROOT; };
+		A0000000000000000000010B /* MusicAuthorizationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Services/MusicAuthorizationServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000110 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = AMImport/Support/Info.plist; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000111 /* AMImport.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AMImport.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000112 /* AMImportTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AMImportTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000120 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000500 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000501 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0000000000000000000000C /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000600 = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000601 /* AMImport */,
+				A00000000000000000000602 /* Tests */,
+				A00000000000000000000603 /* Frameworks */,
+				A00000000000000000000604 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000601 /* AMImport */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000610 /* App */,
+				A00000000000000000000611 /* Domain */,
+				A00000000000000000000612 /* Services */,
+				A00000000000000000000613 /* Support */,
+			);
+			path = AMImport;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000602 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000620 /* AMImportTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000603 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000120 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000604 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000111 /* AMImport.app */,
+				A00000000000000000000112 /* AMImportTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000610 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000101 /* AMImportApp.swift */,
+				A00000000000000000000102 /* RootView.swift */,
+			);
+			name = App;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000611 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000103 /* Models.swift */,
+				A00000000000000000000104 /* MatchScoring.swift */,
+				A00000000000000000000105 /* MatchingOptions.swift */,
+			);
+			name = Domain;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000612 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000106 /* CSVImporter.swift */,
+				A00000000000000000000107 /* MusicAuthorizationService.swift */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000613 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000110 /* Info.plist */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000620 /* AMImportTests */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000108 /* AMImportTests.swift */,
+				A00000000000000000000109 /* CSVParserTests.swift */,
+				A0000000000000000000010A /* TrackNormalizerTests.swift */,
+				A0000000000000000000010B /* MusicAuthorizationServiceTests.swift */,
+			);
+			path = AMImportTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000400 /* AMImport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000700 /* Build configuration list for PBXNativeTarget "AMImport" */;
+			buildPhases = (
+				A00000000000000000000510 /* Sources */,
+				A00000000000000000000500 /* Frameworks */,
+				A00000000000000000000520 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AMImport;
+			productName = AMImport;
+			productReference = A00000000000000000000111 /* AMImport.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A00000000000000000000401 /* AMImportTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000701 /* Build configuration list for PBXNativeTarget "AMImportTests" */;
+			buildPhases = (
+				A00000000000000000000511 /* Sources */,
+				A00000000000000000000501 /* Frameworks */,
+				A00000000000000000000521 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A00000000000000000000800 /* PBXTargetDependency */,
+			);
+			name = AMImportTests;
+			productName = AMImportTests;
+			productReference = A00000000000000000000112 /* AMImportTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000300 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A00000000000000000000400 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					A00000000000000000000401 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = A00000000000000000000400;
+					};
+				};
+			};
+			buildConfigurationList = A00000000000000000000702 /* Build configuration list for PBXProject "AMImport" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A00000000000000000000600;
+			productRefGroup = A00000000000000000000604 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000400 /* AMImport */,
+				A00000000000000000000401 /* AMImportTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000520 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000521 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000510 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000001 /* AMImportApp.swift in Sources */,
+				A00000000000000000000002 /* RootView.swift in Sources */,
+				A00000000000000000000003 /* Models.swift in Sources */,
+				A00000000000000000000004 /* MatchScoring.swift in Sources */,
+				A00000000000000000000005 /* MatchingOptions.swift in Sources */,
+				A00000000000000000000006 /* CSVImporter.swift in Sources */,
+				A00000000000000000000007 /* MusicAuthorizationService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000511 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000008 /* AMImportTests.swift in Sources */,
+				A00000000000000000000009 /* CSVParserTests.swift in Sources */,
+				A0000000000000000000000A /* TrackNormalizerTests.swift in Sources */,
+				A0000000000000000000000B /* MusicAuthorizationServiceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000000800 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A00000000000000000000400 /* AMImport */;
+			targetProxy = A00000000000000000000201 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000000900 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A00000000000000000000901 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		A00000000000000000000910 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DEFINES_MODULE = YES;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AMImport/Support/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AMImport;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A00000000000000000000911 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DEFINES_MODULE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AMImport/Support/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AMImport;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A00000000000000000000920 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AMImportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AMImport.app/Contents/MacOS/AMImport";
+			};
+			name = Debug;
+		};
+		A00000000000000000000921 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AMImportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AMImport.app/Contents/MacOS/AMImport";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000000700 /* Build configuration list for PBXNativeTarget "AMImport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000910 /* Debug */,
+				A00000000000000000000911 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000000701 /* Build configuration list for PBXNativeTarget "AMImportTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000920 /* Debug */,
+				A00000000000000000000921 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000000702 /* Build configuration list for PBXProject "AMImport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000900 /* Debug */,
+				A00000000000000000000901 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000300 /* Project object */;
+}

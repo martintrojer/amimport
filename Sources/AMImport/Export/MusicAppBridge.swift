@@ -6,11 +6,14 @@ enum MusicAppBridgeError: Error {
 }
 
 protocol MusicAppControlling {
+    @MainActor
     func createPlaylist(name: String, trackIDs: [String]) async throws
+    @MainActor
     func enqueue(trackIDs: [String]) async throws
 }
 
 struct MusicAppBridge: MusicAppControlling {
+    @MainActor
     func createPlaylist(name: String, trackIDs: [String]) async throws {
         guard !trackIDs.isEmpty else { return }
 
@@ -35,6 +38,7 @@ struct MusicAppBridge: MusicAppControlling {
         try runAppleScript(script)
     }
 
+    @MainActor
     func enqueue(trackIDs: [String]) async throws {
         guard !trackIDs.isEmpty else { return }
 

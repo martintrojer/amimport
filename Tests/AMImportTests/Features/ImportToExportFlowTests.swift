@@ -2,6 +2,25 @@ import XCTest
 @testable import AMImport
 
 final class ImportToExportFlowTests: XCTestCase {
+    func test_matchSnapshot_roundTripsCatalogAndLibraryIDs() throws {
+        let snapshot = MatchDecisionSnapshot(
+            rowID: "row-1",
+            status: .autoMatched,
+            selectedTrackID: "sel-1",
+            catalogSongID: "cat-1",
+            librarySongID: "lib-1",
+            candidateTrackIDs: ["sel-1"],
+            confidence: 0.98,
+            rationale: "exact"
+        )
+
+        let data = try JSONEncoder().encode(snapshot)
+        let decoded = try JSONDecoder().decode(MatchDecisionSnapshot.self, from: data)
+
+        XCTAssertEqual(decoded.catalogSongID, "cat-1")
+        XCTAssertEqual(decoded.librarySongID, "lib-1")
+    }
+
     @MainActor
     func test_importToExport_passesOrderedTrackIDsToExporter() async {
         let rawCSV = """

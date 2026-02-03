@@ -548,7 +548,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project AMI
 
 - [x] Task 1: Create branch and baseline build
 - [x] Task 2: Add catalog/library IDs to snapshots
-- [ ] Task 3: Add snapshot serialization regression test
+- [x] Task 3: Add snapshot serialization regression test
 - [ ] Task 4: Add MusicKit search abstractions
 - [ ] Task 5: Add MusicKit client tests
 - [ ] Task 6: Implement MusicKit client

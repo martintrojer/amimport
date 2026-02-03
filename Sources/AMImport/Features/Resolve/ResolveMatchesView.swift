@@ -1,11 +1,14 @@
 import SwiftUI
+import Foundation
 
 struct ResolveRow: Identifiable, Equatable {
     let id: String
     let title: String
     let artist: String
-    let candidateTrackIDs: [String]
+    let candidates: [MatchCandidateSnapshot]
     var selectedTrackID: String?
+    var selectedCatalogSongID: String?
+    var selectedLibrarySongID: String?
     var status: MatchStatus
 }
 
@@ -31,8 +34,31 @@ struct ResolveMatchesView: View {
                     Text(row.artist)
                 }
                 TableColumn("Candidates") { row in
-                    Text(row.candidateTrackIDs.joined(separator: ", "))
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(row.candidates) { candidate in
+                            HStack(spacing: 8) {
+                                AsyncImage(url: candidate.artworkURL) { image in
+                                    image.resizable().scaledToFill()
+                                } placeholder: {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Color.gray.opacity(0.2))
+                                }
+                                .frame(width: 28, height: 28)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(candidate.title)
+                                    Text("\(candidate.artist) • \(candidate.album ?? "-")")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Text(formatDuration(candidate.durationSeconds))
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 }
                 TableColumn("Status") { row in
                     Text(row.status.rawValue)
@@ -55,7 +81,7 @@ struct ResolveMatchesView: View {
         }
     }
 
-    private static func buildRows(from session: ImportSession?) -> [ResolveRow] {
+    static func buildRows(from session: ImportSession?) -> [ResolveRow] {
         guard let session else { return [] }
         let sourceByID = Dictionary(uniqueKeysWithValues: session.importedRows.map { ($0.id, $0) })
 
@@ -69,8 +95,10 @@ struct ResolveMatchesView: View {
                 id: snapshot.rowID,
                 title: source.title,
                 artist: source.artist,
-                candidateTrackIDs: snapshot.candidateTrackIDs,
+                candidates: snapshot.candidates,
                 selectedTrackID: snapshot.selectedTrackID,
+                selectedCatalogSongID: snapshot.catalogSongID,
+                selectedLibrarySongID: snapshot.librarySongID,
                 status: snapshot.status
             )
         }
@@ -78,13 +106,21 @@ struct ResolveMatchesView: View {
 
     private func applyFirstCandidate(for rowID: String) {
         guard let index = unresolvedRows.firstIndex(where: { $0.id == rowID }),
-              let first = unresolvedRows[index].candidateTrackIDs.first else {
+              let first = unresolvedRows[index].candidates.first else {
             return
         }
 
-        unresolvedRows[index].selectedTrackID = first
+        unresolvedRows[index].selectedTrackID = first.id
+        unresolvedRows[index].selectedCatalogSongID = first.catalogSongID
+        unresolvedRows[index].selectedLibrarySongID = first.librarySongID
         unresolvedRows[index].status = .userMatched
-        syncSession(rowID: rowID, status: .userMatched, selectedTrackID: first)
+        syncSession(
+            rowID: rowID,
+            status: .userMatched,
+            selectedTrackID: first.id,
+            catalogSongID: first.catalogSongID,
+            librarySongID: first.librarySongID
+        )
     }
 
     private func skip(rowID: String) {
@@ -93,10 +129,16 @@ struct ResolveMatchesView: View {
         }
 
         unresolvedRows[index].status = .skipped
-        syncSession(rowID: rowID, status: .skipped, selectedTrackID: nil)
+        syncSession(rowID: rowID, status: .skipped, selectedTrackID: nil, catalogSongID: nil, librarySongID: nil)
     }
 
-    private func syncSession(rowID: String, status: MatchStatus, selectedTrackID: String?) {
+    private func syncSession(
+        rowID: String,
+        status: MatchStatus,
+        selectedTrackID: String?,
+        catalogSongID: String?,
+        librarySongID: String?
+    ) {
         guard var current = session else { return }
 
         let updatedDecisions = current.decisions.map { snapshot -> MatchDecisionSnapshot in
@@ -105,9 +147,10 @@ struct ResolveMatchesView: View {
                 rowID: snapshot.rowID,
                 status: status,
                 selectedTrackID: selectedTrackID,
-                catalogSongID: snapshot.catalogSongID,
-                librarySongID: snapshot.librarySongID,
+                catalogSongID: catalogSongID,
+                librarySongID: librarySongID,
                 candidateTrackIDs: snapshot.candidateTrackIDs,
+                candidates: snapshot.candidates,
                 confidence: snapshot.confidence,
                 rationale: snapshot.rationale
             )
@@ -126,5 +169,12 @@ struct ResolveMatchesView: View {
         )
 
         session = current
+    }
+
+    private func formatDuration(_ durationSeconds: Int?) -> String {
+        guard let durationSeconds else { return "--:--" }
+        let minutes = durationSeconds / 60
+        let seconds = durationSeconds % 60
+        return "\(minutes):" + String(format: "%02d", seconds)
     }
 }

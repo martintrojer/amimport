@@ -33,8 +33,80 @@ struct MatchDecisionSnapshot: Codable, Equatable {
     let catalogSongID: String?
     let librarySongID: String?
     let candidateTrackIDs: [String]
+    let candidates: [MatchCandidateSnapshot]
     let confidence: Double
     let rationale: String
+
+    init(
+        rowID: String,
+        status: MatchStatus,
+        selectedTrackID: String?,
+        catalogSongID: String?,
+        librarySongID: String?,
+        candidateTrackIDs: [String],
+        candidates: [MatchCandidateSnapshot],
+        confidence: Double,
+        rationale: String
+    ) {
+        self.rowID = rowID
+        self.status = status
+        self.selectedTrackID = selectedTrackID
+        self.catalogSongID = catalogSongID
+        self.librarySongID = librarySongID
+        self.candidateTrackIDs = candidateTrackIDs
+        self.candidates = candidates
+        self.confidence = confidence
+        self.rationale = rationale
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case rowID
+        case status
+        case selectedTrackID
+        case catalogSongID
+        case librarySongID
+        case candidateTrackIDs
+        case candidates
+        case confidence
+        case rationale
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        rowID = try container.decode(String.self, forKey: .rowID)
+        status = try container.decode(MatchStatus.self, forKey: .status)
+        selectedTrackID = try container.decodeIfPresent(String.self, forKey: .selectedTrackID)
+        catalogSongID = try container.decodeIfPresent(String.self, forKey: .catalogSongID)
+        librarySongID = try container.decodeIfPresent(String.self, forKey: .librarySongID)
+        candidateTrackIDs = try container.decodeIfPresent([String].self, forKey: .candidateTrackIDs) ?? []
+        candidates = try container.decodeIfPresent([MatchCandidateSnapshot].self, forKey: .candidates) ?? []
+        confidence = try container.decode(Double.self, forKey: .confidence)
+        rationale = try container.decode(String.self, forKey: .rationale)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(rowID, forKey: .rowID)
+        try container.encode(status, forKey: .status)
+        try container.encodeIfPresent(selectedTrackID, forKey: .selectedTrackID)
+        try container.encodeIfPresent(catalogSongID, forKey: .catalogSongID)
+        try container.encodeIfPresent(librarySongID, forKey: .librarySongID)
+        try container.encode(candidateTrackIDs, forKey: .candidateTrackIDs)
+        try container.encode(candidates, forKey: .candidates)
+        try container.encode(confidence, forKey: .confidence)
+        try container.encode(rationale, forKey: .rationale)
+    }
+}
+
+struct MatchCandidateSnapshot: Codable, Equatable, Identifiable {
+    let id: String
+    let catalogSongID: String?
+    let librarySongID: String?
+    let title: String
+    let artist: String
+    let album: String?
+    let artworkURL: URL?
+    let durationSeconds: Int?
 }
 
 @MainActor

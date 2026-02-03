@@ -58,6 +58,19 @@ struct TrackResolutionService: TrackResolving {
 
         let decision = matcher.match(row: row, in: tracks, options: options)
         let selected = decision.result.selectedTrack.flatMap { byTrackID[$0.id] }
+        let candidates = decision.result.candidates.compactMap { candidate -> MatchCandidateSnapshot? in
+            guard let resolved = byTrackID[candidate.track.id] else { return nil }
+            return MatchCandidateSnapshot(
+                id: candidate.track.id,
+                catalogSongID: resolved.catalogSongID,
+                librarySongID: resolved.librarySongID,
+                title: resolved.title,
+                artist: resolved.artist,
+                album: resolved.album,
+                artworkURL: resolved.artworkURL,
+                durationSeconds: resolved.durationSeconds
+            )
+        }
 
         return MatchDecisionSnapshot(
             rowID: row.id,
@@ -66,6 +79,7 @@ struct TrackResolutionService: TrackResolving {
             catalogSongID: selected?.catalogSongID,
             librarySongID: selected?.librarySongID,
             candidateTrackIDs: decision.result.candidates.map(\.track.id),
+            candidates: candidates,
             confidence: decision.confidence,
             rationale: decision.rationale
         )

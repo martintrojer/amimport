@@ -15,20 +15,25 @@ enum MusicPermissionState: Equatable {
 }
 
 protocol MusicAuthorizing {
+    @MainActor
     func currentStatus() -> MusicAuthorizationStatus
+    @MainActor
     func request() async -> MusicAuthorizationStatus
 }
 
 struct MusicAuthorizationService: MusicAuthorizing {
+    @MainActor
     func currentStatus() -> MusicAuthorizationStatus {
         .notDetermined
     }
 
+    @MainActor
     func request() async -> MusicAuthorizationStatus {
         .notDetermined
     }
 }
 
+@MainActor
 final class MusicAuthorizationViewModel {
     private let authorizer: MusicAuthorizing
 

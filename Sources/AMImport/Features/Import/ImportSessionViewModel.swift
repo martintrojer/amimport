@@ -34,6 +34,7 @@ struct MatchDecisionSnapshot: Codable, Equatable {
     let rationale: String
 }
 
+@MainActor
 final class ImportSessionViewModel: ObservableObject {
     @Published var state: ImportState = .idle
     @Published var session: ImportSession?

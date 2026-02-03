@@ -1,10 +1,12 @@
 import Foundation
 
 protocol LibrarySnapshotting {
+    @MainActor
     func fetchAll(progress: @escaping (Int) -> Void) async throws -> [LibraryTrack]
 }
 
 protocol LibrarySongProviding {
+    @MainActor
     func fetchPage(offset: Int, limit: Int) async throws -> [LibraryTrack]
 }
 
@@ -17,6 +19,7 @@ struct LibrarySnapshotService: LibrarySnapshotting {
         self.pageSize = pageSize
     }
 
+    @MainActor
     func fetchAll(progress: @escaping (Int) -> Void) async throws -> [LibraryTrack] {
         var all: [LibraryTrack] = []
         var offset = 0

@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 import SwiftUI
 
 enum ImportState: Equatable {
@@ -38,6 +39,13 @@ struct MatchDecisionSnapshot: Codable, Equatable {
 final class ImportSessionViewModel: ObservableObject {
     @Published var state: ImportState = .idle
     @Published var session: ImportSession?
+    @Published var connectionStatusText: String = "Not checked"
+    @Published var isConnectionHealthy: Bool = false
+    @Published private(set) var lastAuthorizationStatus: MusicAuthorizationStatus = .notDetermined
+
+    var shouldShowOpenSettingsShortcut: Bool {
+        lastAuthorizationStatus == .denied
+    }
 
     private let authorizer: MusicAuthorizing
     private let snapshotter: LibrarySnapshotting
@@ -64,6 +72,7 @@ final class ImportSessionViewModel: ObservableObject {
 
             state = .requestingPermission
             let authorization = await resolveAuthorization()
+            lastAuthorizationStatus = authorization
             guard authorization == .authorized else {
                 state = .failed(permissionMessage(for: authorization))
                 return
@@ -71,6 +80,10 @@ final class ImportSessionViewModel: ObservableObject {
 
             state = .loadingLibrary
             let library = try await snapshotter.fetchAll { _ in }
+            guard !library.isEmpty else {
+                state = .failed("Connected to Music, but no library tracks were found. Open the Music app and confirm your library is populated and sync is enabled.")
+                return
+            }
 
             var snapshots: [MatchDecisionSnapshot] = []
             snapshots.reserveCapacity(rows.count)
@@ -108,6 +121,40 @@ final class ImportSessionViewModel: ObservableObject {
         }
     }
 
+    func refreshConnectionStatus() async {
+        let authorization = await resolveAuthorization()
+        lastAuthorizationStatus = authorization
+        guard authorization == .authorized else {
+            isConnectionHealthy = false
+            connectionStatusText = permissionMessage(for: authorization)
+            return
+        }
+
+        do {
+            let library = try await snapshotter.fetchAll { _ in }
+            if library.isEmpty {
+                isConnectionHealthy = false
+                connectionStatusText = "Connected, but no library tracks were found."
+            } else {
+                isConnectionHealthy = true
+                connectionStatusText = "Connected (\(library.count) library tracks available)."
+            }
+        } catch {
+            isConnectionHealthy = false
+            connectionStatusText = "Music connection check failed: \(error.localizedDescription)"
+        }
+    }
+
+    func openSystemSettingsForMediaAndMusic() {
+        if let privacyURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Media"),
+           NSWorkspace.shared.open(privacyURL) {
+            return
+        }
+        if let settingsURL = URL(string: "x-apple.systempreferences:com.apple.Settings.PrivacySecurity.extension") {
+            _ = NSWorkspace.shared.open(settingsURL)
+        }
+    }
+
     private func resolveAuthorization() async -> MusicAuthorizationStatus {
         let current = authorizer.currentStatus()
         if current == .notDetermined {
@@ -121,9 +168,9 @@ final class ImportSessionViewModel: ObservableObject {
         case .authorized:
             return ""
         case .denied:
-            return "Apple Music access is denied."
+            return "Apple Music access is denied. Enable access for AMImport in System Settings > Privacy & Security > Media & Apple Music."
         case .restricted:
-            return "Apple Music access is restricted."
+            return "Apple Music access is restricted for this account or device."
         case .notDetermined:
             return "Apple Music access has not been granted."
         }

@@ -1,4 +1,5 @@
 import Foundation
+import MusicKit
 
 enum MusicAuthorizationStatus: Equatable {
     case notDetermined
@@ -24,12 +25,27 @@ protocol MusicAuthorizing {
 struct MusicAuthorizationService: MusicAuthorizing {
     @MainActor
     func currentStatus() -> MusicAuthorizationStatus {
-        .notDetermined
+        map(MusicAuthorization.currentStatus)
     }
 
     @MainActor
     func request() async -> MusicAuthorizationStatus {
-        .notDetermined
+        map(await MusicAuthorization.request())
+    }
+
+    private func map(_ status: MusicAuthorization.Status) -> MusicAuthorizationStatus {
+        switch status {
+        case .notDetermined:
+            return .notDetermined
+        case .denied:
+            return .denied
+        case .restricted:
+            return .restricted
+        case .authorized:
+            return .authorized
+        @unknown default:
+            return .restricted
+        }
     }
 }
 

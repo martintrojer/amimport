@@ -35,6 +35,41 @@ final class ImportToExportFlowTests: XCTestCase {
 
         XCTAssertEqual(exporter.enqueuedTrackIDs, ["id1", "id2"])
     }
+
+    @MainActor
+    func test_runImport_failsWithHelpfulMessageWhenLibraryIsEmpty() async {
+        let rawCSV = """
+        title,artist
+        Track One,Artist A
+        """
+
+        let importViewModel = ImportSessionViewModel(
+            authorizer: AuthorizedAuthorizer(),
+            snapshotter: StubSnapshotter(libraryTracks: [])
+        )
+
+        await importViewModel.runImport(rawInput: rawCSV, format: .csv, options: .default)
+
+        guard case let .failed(message) = importViewModel.state else {
+            XCTFail("Expected failed state")
+            return
+        }
+        XCTAssertTrue(message.contains("no library tracks"))
+    }
+
+    @MainActor
+    func test_refreshConnectionStatus_reportsPermissionFailure() async {
+        let importViewModel = ImportSessionViewModel(
+            authorizer: DeniedAuthorizer(),
+            snapshotter: StubSnapshotter(libraryTracks: [])
+        )
+
+        await importViewModel.refreshConnectionStatus()
+
+        XCTAssertFalse(importViewModel.isConnectionHealthy)
+        XCTAssertTrue(importViewModel.connectionStatusText.contains("denied"))
+        XCTAssertTrue(importViewModel.shouldShowOpenSettingsShortcut)
+    }
 }
 
 private struct AuthorizedAuthorizer: MusicAuthorizing {
@@ -43,6 +78,14 @@ private struct AuthorizedAuthorizer: MusicAuthorizing {
 
     @MainActor
     func request() async -> MusicAuthorizationStatus { .authorized }
+}
+
+private struct DeniedAuthorizer: MusicAuthorizing {
+    @MainActor
+    func currentStatus() -> MusicAuthorizationStatus { .denied }
+
+    @MainActor
+    func request() async -> MusicAuthorizationStatus { .denied }
 }
 
 private struct StubSnapshotter: LibrarySnapshotting {

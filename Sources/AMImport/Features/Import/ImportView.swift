@@ -30,6 +30,26 @@ struct ImportView: View {
                 }
             }
 
+            GroupBox("Music Connection") {
+                HStack(spacing: 12) {
+                    Image(systemName: viewModel.isConnectionHealthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                        .foregroundStyle(viewModel.isConnectionHealthy ? .green : .orange)
+                    Text(viewModel.connectionStatusText)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Check Connection") {
+                        Task { @MainActor in
+                            await viewModel.refreshConnectionStatus()
+                        }
+                    }
+                    if viewModel.shouldShowOpenSettingsShortcut {
+                        Button("Open System Settings") {
+                            viewModel.openSystemSettingsForMediaAndMusic()
+                        }
+                    }
+                }
+            }
+
             GroupBox("Matching") {
                 VStack(alignment: .leading, spacing: 10) {
                     Toggle("Exact", isOn: $useExact)
@@ -82,6 +102,9 @@ struct ImportView: View {
         }
         .onChange(of: viewModel.session) { _, session in
             onSessionUpdated?(session)
+        }
+        .task {
+            await viewModel.refreshConnectionStatus()
         }
     }
 

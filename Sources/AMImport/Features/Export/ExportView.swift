@@ -14,17 +14,25 @@ final class ExportViewModel: ObservableObject {
     }
 
     func export(session: ImportSession) async {
+        let resolvedCount = session.decisions.filter { snapshot in
+            snapshot.status == .autoMatched || snapshot.status == .userMatched
+        }.count
+
         let catalogSongIDs = session.decisions.compactMap { snapshot -> String? in
             switch snapshot.status {
             case .autoMatched, .userMatched:
-                return snapshot.catalogSongID ?? snapshot.selectedTrackID
+                return snapshot.catalogSongID
             case .unmatched, .skipped:
                 return nil
             }
         }
 
         guard !catalogSongIDs.isEmpty else {
-            statusMessage = "No resolved tracks to export."
+            if resolvedCount > 0 {
+                statusMessage = "Resolved \(resolvedCount) tracks, but none have catalog IDs for MusicKit enqueue yet."
+            } else {
+                statusMessage = "No resolved tracks to export."
+            }
             return
         }
 

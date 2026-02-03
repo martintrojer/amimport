@@ -25,7 +25,11 @@ struct TrackResolutionService: TrackResolving {
 
         let libraryDecision = evaluate(row: row, options: options, songs: libraryResults)
         if libraryDecision.status != .unmatched || !libraryResults.isEmpty {
-            return libraryDecision
+            return try await enrichLibraryMatchWithCatalogIDIfNeeded(
+                base: libraryDecision,
+                row: row,
+                options: options
+            )
         }
 
         let catalogResults = try await searcher.searchCatalog(
@@ -36,6 +40,42 @@ struct TrackResolutionService: TrackResolving {
         )
 
         return evaluate(row: row, options: options, songs: catalogResults)
+    }
+
+    @MainActor
+    private func enrichLibraryMatchWithCatalogIDIfNeeded(
+        base: MatchDecisionSnapshot,
+        row: ImportTrackRow,
+        options: MatchingOptions
+    ) async throws -> MatchDecisionSnapshot {
+        guard base.status != .unmatched,
+              base.catalogSongID == nil else {
+            return base
+        }
+
+        let catalogResults = try await searcher.searchCatalog(
+            title: row.title,
+            artist: row.artist,
+            album: row.album,
+            limit: options.candidateLimit
+        )
+        let catalogDecision = evaluate(row: row, options: options, songs: catalogResults)
+
+        guard let catalogSongID = catalogDecision.catalogSongID else {
+            return base
+        }
+
+        return MatchDecisionSnapshot(
+            rowID: base.rowID,
+            status: base.status,
+            selectedTrackID: base.selectedTrackID,
+            catalogSongID: catalogSongID,
+            librarySongID: base.librarySongID,
+            candidateTrackIDs: base.candidateTrackIDs,
+            candidates: base.candidates,
+            confidence: base.confidence,
+            rationale: base.rationale
+        )
     }
 
     private func evaluate(row: ImportTrackRow, options: MatchingOptions, songs: [ResolvedSong]) -> MatchDecisionSnapshot {

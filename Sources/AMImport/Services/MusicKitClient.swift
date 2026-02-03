@@ -54,7 +54,7 @@ struct MusicKitClient: MusicCatalogSearching {
 
     private func mapLibrarySong(_ song: Song) -> ResolvedSong {
         ResolvedSong(
-            catalogSongID: song.id.rawValue,
+            catalogSongID: nil,
             librarySongID: song.id.rawValue,
             title: song.title,
             artist: song.artistName,

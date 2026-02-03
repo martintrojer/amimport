@@ -551,7 +551,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project AMI
 - [x] Task 3: Add snapshot serialization regression test
 - [x] Task 4: Add MusicKit search abstractions
 - [x] Task 5: Add MusicKit client tests
-- [ ] Task 6: Implement MusicKit client
+- [x] Task 6: Implement MusicKit client
 - [ ] Task 7: Add track resolution service
 - [ ] Task 8: Add resolver fallback tests
 - [ ] Task 9: Wire import flow to async resolver

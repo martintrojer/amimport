@@ -27,4 +27,35 @@ final class CSVParserTests: XCTestCase {
         XCTAssertEqual(rows.first?.title, "Song")
         XCTAssertEqual(rows.first?.artist, "Artist")
     }
+
+    func test_parse_acceptsCommonHeaderAliases() throws {
+        let csv = "Track Name,Artist Name\nSong,Artist"
+
+        let rows = try CSVImporter().parse(csv)
+
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows.first?.title, "Song")
+        XCTAssertEqual(rows.first?.artist, "Artist")
+    }
+
+    func test_parse_handlesSemicolonDelimiter() throws {
+        let csv = "title;artist\nSong;Artist"
+
+        let rows = try CSVImporter().parse(csv)
+
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows.first?.title, "Song")
+        XCTAssertEqual(rows.first?.artist, "Artist")
+    }
+
+    func test_missingColumns_hasHelpfulError() {
+        let csv = "album,year\nA,2024"
+
+        XCTAssertThrowsError(try CSVImporter().parse(csv)) { error in
+            XCTAssertEqual(
+                error.localizedDescription,
+                "Missing required column(s): title, artist. Expected at least title and artist."
+            )
+        }
+    }
 }

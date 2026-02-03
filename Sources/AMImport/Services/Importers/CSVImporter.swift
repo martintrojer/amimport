@@ -6,9 +6,29 @@ protocol ImportParsing {
 
 enum CSVImportError: Error, Equatable {
     case missingRequiredColumns([String])
+    case emptyFile
+}
+
+extension CSVImportError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case let .missingRequiredColumns(columns):
+            return "Missing required column(s): \(columns.joined(separator: ", ")). Expected at least title and artist."
+        case .emptyFile:
+            return "The selected file is empty."
+        }
+    }
 }
 
 struct CSVImporter: ImportParsing {
+    private static let headerAliases: [String: [String]] = [
+        "title": ["title", "song", "track", "track name", "song title", "name"],
+        "artist": ["artist", "artist name", "album artist"],
+        "album": ["album", "album title", "release"],
+        "duration": ["duration", "length", "time"],
+        "isrc": ["isrc", "isrc code"]
+    ]
+
     func parse(_ raw: String) throws -> [ImportTrackRow] {
         let cleaned = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         let noBOM = cleaned.replacingOccurrences(of: "\u{feff}", with: "")
@@ -17,28 +37,37 @@ struct CSVImporter: ImportParsing {
             .map(String.init)
             .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
 
-        guard let headerLine = lines.first else { return [] }
+        guard let headerLine = lines.first else {
+            throw CSVImportError.emptyFile
+        }
 
-        let headers = parseCSVLine(headerLine).map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+        let delimiter = detectDelimiter(in: headerLine)
+        let headers = parseDelimitedLine(headerLine, delimiter: delimiter)
+            .map(normalizeHeader)
 
-        let required = ["title", "artist"]
-        let missing = required.filter { !headers.contains($0) }
+        let titleIndex = firstIndex(forCanonical: "title", in: headers)
+        let artistIndex = firstIndex(forCanonical: "artist", in: headers)
+        let albumIndex = firstIndex(forCanonical: "album", in: headers)
+        let durationIndex = firstIndex(forCanonical: "duration", in: headers)
+        let isrcIndex = firstIndex(forCanonical: "isrc", in: headers)
+
+        let missing = [
+            titleIndex == nil ? "title" : nil,
+            artistIndex == nil ? "artist" : nil
+        ].compactMap { $0 }
         if !missing.isEmpty {
             throw CSVImportError.missingRequiredColumns(missing)
         }
 
-        let titleIndex = headers.firstIndex(of: "title")!
-        let artistIndex = headers.firstIndex(of: "artist")!
-        let albumIndex = headers.firstIndex(of: "album")
-        let durationIndex = headers.firstIndex(of: "duration")
-        let isrcIndex = headers.firstIndex(of: "isrc")
+        let requiredTitleIndex = titleIndex!
+        let requiredArtistIndex = artistIndex!
 
         var rows: [ImportTrackRow] = []
 
         for (rowOffset, line) in lines.dropFirst().enumerated() {
-            let values = parseCSVLine(line)
-            let title = value(at: titleIndex, in: values).trimmingCharacters(in: .whitespacesAndNewlines)
-            let artist = value(at: artistIndex, in: values).trimmingCharacters(in: .whitespacesAndNewlines)
+            let values = parseDelimitedLine(line, delimiter: delimiter)
+            let title = value(at: requiredTitleIndex, in: values).trimmingCharacters(in: .whitespacesAndNewlines)
+            let artist = value(at: requiredArtistIndex, in: values).trimmingCharacters(in: .whitespacesAndNewlines)
 
             guard !title.isEmpty, !artist.isEmpty else { continue }
 
@@ -59,6 +88,26 @@ struct CSVImporter: ImportParsing {
         }
 
         return rows
+    }
+
+    private func detectDelimiter(in headerLine: String) -> Character {
+        let candidates: [Character] = [",", ";", "\t"]
+        let best = candidates.max { lhs, rhs in
+            parseDelimitedLine(headerLine, delimiter: lhs).count < parseDelimitedLine(headerLine, delimiter: rhs).count
+        }
+        return best ?? ","
+    }
+
+    private func firstIndex(forCanonical canonical: String, in headers: [String]) -> Int? {
+        let aliases = Set(Self.headerAliases[canonical] ?? [canonical])
+        return headers.firstIndex { aliases.contains($0) }
+    }
+
+    private func normalizeHeader(_ raw: String) -> String {
+        raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+            .replacingOccurrences(of: "_", with: " ")
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
     }
 
     private func value(at index: Int, in values: [String]) -> String {
@@ -88,7 +137,7 @@ struct CSVImporter: ImportParsing {
         return minutes * 60 + seconds
     }
 
-    private func parseCSVLine(_ line: String) -> [String] {
+    private func parseDelimitedLine(_ line: String, delimiter: Character) -> [String] {
         var output: [String] = []
         var current = ""
         var inQuotes = false
@@ -105,7 +154,7 @@ struct CSVImporter: ImportParsing {
                 } else {
                     inQuotes.toggle()
                 }
-            } else if char == "," && !inQuotes {
+            } else if char == delimiter && !inQuotes {
                 output.append(current)
                 current.removeAll(keepingCapacity: true)
             } else {

@@ -10,6 +10,18 @@ final class ImportToExportFlowTests: XCTestCase {
             catalogSongID: "cat-1",
             librarySongID: "lib-1",
             candidateTrackIDs: ["sel-1"],
+            candidates: [
+                MatchCandidateSnapshot(
+                    id: "sel-1",
+                    catalogSongID: "cat-1",
+                    librarySongID: "lib-1",
+                    title: "Track",
+                    artist: "Artist",
+                    album: "Album",
+                    artworkURL: URL(string: "https://example.com/art.jpg"),
+                    durationSeconds: 222
+                )
+            ],
             confidence: 0.98,
             rationale: "exact"
         )
@@ -107,6 +119,86 @@ final class ImportToExportFlowTests: XCTestCase {
         XCTAssertFalse(importViewModel.isConnectionHealthy)
         XCTAssertTrue(importViewModel.connectionNeedsAutomationPermission)
     }
+
+    func test_resolveRows_includeCandidatePreviewFields() {
+        let session = ImportSession(
+            format: .csv,
+            options: .default,
+            importedRows: [ImportTrackRow(sourceLine: 1, title: "Track One", artist: "Artist A")],
+            decisions: [
+                MatchDecisionSnapshot(
+                    rowID: "row-1",
+                    status: .unmatched,
+                    selectedTrackID: nil,
+                    catalogSongID: nil,
+                    librarySongID: nil,
+                    candidateTrackIDs: ["c1"],
+                    candidates: [
+                        MatchCandidateSnapshot(
+                            id: "c1",
+                            catalogSongID: "cat-1",
+                            librarySongID: "lib-1",
+                            title: "Track One",
+                            artist: "Artist A",
+                            album: "Album A",
+                            artworkURL: URL(string: "https://example.com/a.jpg"),
+                            durationSeconds: 222
+                        )
+                    ],
+                    confidence: 0.8,
+                    rationale: "candidate"
+                )
+            ],
+            summary: ImportSummary(totalRows: 1, autoMatched: 0, unmatched: 1),
+            createdAt: Date()
+        )
+
+        let rows = ResolveMatchesView.buildRows(from: session)
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows[0].candidates.first?.title, "Track One")
+        XCTAssertEqual(rows[0].candidates.first?.album, "Album A")
+        XCTAssertEqual(rows[0].candidates.first?.durationSeconds, 222)
+    }
+
+    func test_resolveRows_keepMissingPreviewFieldsAsNil() {
+        let session = ImportSession(
+            format: .csv,
+            options: .default,
+            importedRows: [ImportTrackRow(sourceLine: 1, title: "Track One", artist: "Artist A")],
+            decisions: [
+                MatchDecisionSnapshot(
+                    rowID: "row-1",
+                    status: .unmatched,
+                    selectedTrackID: nil,
+                    catalogSongID: nil,
+                    librarySongID: nil,
+                    candidateTrackIDs: ["c1"],
+                    candidates: [
+                        MatchCandidateSnapshot(
+                            id: "c1",
+                            catalogSongID: nil,
+                            librarySongID: nil,
+                            title: "Track One",
+                            artist: "Artist A",
+                            album: nil,
+                            artworkURL: nil,
+                            durationSeconds: nil
+                        )
+                    ],
+                    confidence: 0.8,
+                    rationale: "candidate"
+                )
+            ],
+            summary: ImportSummary(totalRows: 1, autoMatched: 0, unmatched: 1),
+            createdAt: Date()
+        )
+
+        let rows = ResolveMatchesView.buildRows(from: session)
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertNil(rows[0].candidates.first?.album)
+        XCTAssertNil(rows[0].candidates.first?.artworkURL)
+        XCTAssertNil(rows[0].candidates.first?.durationSeconds)
+    }
 }
 
 private struct StubResolver: TrackResolving {
@@ -123,6 +215,18 @@ private struct StubResolver: TrackResolving {
             catalogSongID: decision.result.selectedTrack?.id,
             librarySongID: decision.result.selectedTrack?.id,
             candidateTrackIDs: decision.result.candidates.map(\.track.id),
+            candidates: decision.result.candidates.map { candidate in
+                MatchCandidateSnapshot(
+                    id: candidate.track.id,
+                    catalogSongID: candidate.track.id,
+                    librarySongID: candidate.track.id,
+                    title: candidate.track.title,
+                    artist: candidate.track.artist,
+                    album: candidate.track.album,
+                    artworkURL: nil,
+                    durationSeconds: candidate.track.durationSeconds
+                )
+            },
             confidence: decision.confidence,
             rationale: decision.rationale
         )

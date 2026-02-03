@@ -7,23 +7,23 @@ final class ExportViewModel: ObservableObject {
     @Published var statusMessage = ""
     @Published var isExporting = false
 
-    private let exporter: MusicAppControlling
+    private let exporter: MusicKitExporting
 
-    init(exporter: MusicAppControlling) {
+    init(exporter: MusicKitExporting) {
         self.exporter = exporter
     }
 
     func export(session: ImportSession) async {
-        let trackIDs = session.decisions.compactMap { snapshot -> String? in
+        let catalogSongIDs = session.decisions.compactMap { snapshot -> String? in
             switch snapshot.status {
             case .autoMatched, .userMatched:
-                return snapshot.selectedTrackID
+                return snapshot.catalogSongID ?? snapshot.selectedTrackID
             case .unmatched, .skipped:
                 return nil
             }
         }
 
-        guard !trackIDs.isEmpty else {
+        guard !catalogSongIDs.isEmpty else {
             statusMessage = "No resolved tracks to export."
             return
         }
@@ -39,11 +39,11 @@ final class ExportViewModel: ObservableObject {
                     statusMessage = "Playlist name is required."
                     return
                 }
-                try await exporter.createPlaylist(name: name, trackIDs: trackIDs)
-                statusMessage = "Created playlist '\(name)' with \(trackIDs.count) tracks."
+                let summary = try await exporter.createPlaylist(name: name, catalogSongIDs: catalogSongIDs)
+                statusMessage = "Created playlist '\(name)' with \(summary.succeeded)/\(summary.requested) tracks."
             case .enqueue:
-                try await exporter.enqueue(trackIDs: trackIDs)
-                statusMessage = "Enqueued \(trackIDs.count) tracks."
+                let summary = try await exporter.enqueueAndPlay(catalogSongIDs: catalogSongIDs)
+                statusMessage = "Enqueued \(summary.succeeded)/\(summary.requested). Skipped \(summary.skipped)."
             }
         } catch {
             statusMessage = "Export failed: \(error.localizedDescription)"

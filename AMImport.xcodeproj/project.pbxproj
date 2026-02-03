@@ -26,7 +26,6 @@
 		A00000000000000000000011 /* Sources/AMImport/Features/Resolve/ResolveMatchesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000110 /* Sources/AMImport/Features/Resolve/ResolveMatchesView.swift */; };
 		A00000000000000000000012 /* Sources/AMImport/Services/LibrarySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000113 /* Sources/AMImport/Services/LibrarySearchService.swift */; };
 		A00000000000000000000013 /* Sources/AMImport/Export/ExportTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000111 /* Sources/AMImport/Export/ExportTypes.swift */; };
-		A00000000000000000000014 /* Sources/AMImport/Export/MusicAppBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000112 /* Sources/AMImport/Export/MusicAppBridge.swift */; };
 		A00000000000000000000015 /* Sources/AMImport/Features/Export/ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000114 /* Sources/AMImport/Features/Export/ExportView.swift */; };
 		A00000000000000000000016 /* Sources/AMImport/Services/SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000115 /* Sources/AMImport/Services/SessionStore.swift */; };
 		A00000000000000000000017 /* Tests/AMImportTests/Domain/MatcherPipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000116 /* Tests/AMImportTests/Domain/MatcherPipelineTests.swift */; };
@@ -35,6 +34,7 @@
 		A0000000000000000000001A /* Tests/AMImportTests/Services/MusicKitClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000011A /* Tests/AMImportTests/Services/MusicKitClientTests.swift */; };
 		A0000000000000000000001B /* Sources/AMImport/Services/TrackResolutionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000011B /* Sources/AMImport/Services/TrackResolutionService.swift */; };
 		A0000000000000000000001C /* Tests/AMImportTests/Services/TrackResolutionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000011C /* Tests/AMImportTests/Services/TrackResolutionServiceTests.swift */; };
+		A0000000000000000000001D /* Sources/AMImport/Export/MusicKitExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000011D /* Sources/AMImport/Export/MusicKitExporter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,7 +65,6 @@
 		A0000000000000000000010F /* Sources/AMImport/Features/Import/ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Features/Import/ImportView.swift; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000110 /* Sources/AMImport/Features/Resolve/ResolveMatchesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Features/Resolve/ResolveMatchesView.swift; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000111 /* Sources/AMImport/Export/ExportTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Export/ExportTypes.swift; sourceTree = SOURCE_ROOT; };
-		A00000000000000000000112 /* Sources/AMImport/Export/MusicAppBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Export/MusicAppBridge.swift; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000113 /* Sources/AMImport/Services/LibrarySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Services/LibrarySearchService.swift; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000114 /* Sources/AMImport/Features/Export/ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Features/Export/ExportView.swift; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000115 /* Sources/AMImport/Services/SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Services/SessionStore.swift; sourceTree = SOURCE_ROOT; };
@@ -77,6 +76,7 @@
 		A0000000000000000000011A /* Tests/AMImportTests/Services/MusicKitClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Services/MusicKitClientTests.swift; sourceTree = SOURCE_ROOT; };
 		A0000000000000000000011B /* Sources/AMImport/Services/TrackResolutionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Services/TrackResolutionService.swift; sourceTree = SOURCE_ROOT; };
 		A0000000000000000000011C /* Tests/AMImportTests/Services/TrackResolutionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Services/TrackResolutionServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		A0000000000000000000011D /* Sources/AMImport/Export/MusicKitExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Export/MusicKitExporter.swift; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000130 /* AMImport.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AMImport.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A00000000000000000000131 /* AMImportTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AMImportTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -204,7 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000111 /* Sources/AMImport/Export/ExportTypes.swift */,
-				A00000000000000000000112 /* Sources/AMImport/Export/MusicAppBridge.swift */,
+				A0000000000000000000011D /* Sources/AMImport/Export/MusicKitExporter.swift */,
 			);
 			name = Export;
 			sourceTree = "<group>";
@@ -361,11 +361,11 @@
 				A00000000000000000000011 /* Sources/AMImport/Features/Resolve/ResolveMatchesView.swift in Sources */,
 				A00000000000000000000012 /* Sources/AMImport/Services/LibrarySearchService.swift in Sources */,
 				A00000000000000000000013 /* Sources/AMImport/Export/ExportTypes.swift in Sources */,
-				A00000000000000000000014 /* Sources/AMImport/Export/MusicAppBridge.swift in Sources */,
 				A00000000000000000000015 /* Sources/AMImport/Features/Export/ExportView.swift in Sources */,
 				A00000000000000000000016 /* Sources/AMImport/Services/SessionStore.swift in Sources */,
 				A00000000000000000000019 /* Sources/AMImport/Services/MusicKitClient.swift in Sources */,
 				A0000000000000000000001B /* Sources/AMImport/Services/TrackResolutionService.swift in Sources */,
+				A0000000000000000000001D /* Sources/AMImport/Export/MusicKitExporter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

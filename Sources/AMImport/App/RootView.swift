@@ -39,7 +39,7 @@ struct RootView: View {
             case .exportFlow:
                 ExportView(
                     session: session,
-                    viewModel: ExportViewModel(exporter: MusicAppBridge())
+                    viewModel: ExportViewModel(exporter: MusicKitExporter())
                 )
             }
         }

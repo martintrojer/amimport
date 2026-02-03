@@ -555,7 +555,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project AMI
 - [x] Task 7: Add track resolution service
 - [x] Task 8: Add resolver fallback tests
 - [x] Task 9: Wire import flow to async resolver
-- [ ] Task 10: Remove AppleScript library provider wiring
+- [x] Task 10: Remove AppleScript library provider wiring
 - [ ] Task 11: Add resolve candidate previews
 - [ ] Task 12: Add preview mapping tests
 - [ ] Task 13: Add MusicKit exporter abstraction

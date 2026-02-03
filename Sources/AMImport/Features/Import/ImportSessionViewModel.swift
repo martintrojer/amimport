@@ -41,6 +41,7 @@ final class ImportSessionViewModel: ObservableObject {
     @Published var session: ImportSession?
     @Published var connectionStatusText: String = "Not checked"
     @Published var isConnectionHealthy: Bool = false
+    @Published private(set) var connectionNeedsAutomationPermission: Bool = false
     @Published private(set) var lastAuthorizationStatus: MusicAuthorizationStatus = .notDetermined
 
     var shouldShowOpenSettingsShortcut: Bool {
@@ -121,11 +122,17 @@ final class ImportSessionViewModel: ObservableObject {
         }
     }
 
-    func refreshConnectionStatus() async {
-        let authorization = await resolveAuthorization()
+    func refreshConnectionStatus(requestIfNeeded: Bool = false) async {
+        let authorization: MusicAuthorizationStatus
+        if requestIfNeeded {
+            authorization = await resolveAuthorization()
+        } else {
+            authorization = authorizer.currentStatus()
+        }
         lastAuthorizationStatus = authorization
         guard authorization == .authorized else {
             isConnectionHealthy = false
+            connectionNeedsAutomationPermission = false
             connectionStatusText = permissionMessage(for: authorization)
             return
         }
@@ -134,13 +141,16 @@ final class ImportSessionViewModel: ObservableObject {
             let library = try await snapshotter.fetchAll { _ in }
             if library.isEmpty {
                 isConnectionHealthy = false
+                connectionNeedsAutomationPermission = false
                 connectionStatusText = "Connected, but no library tracks were found."
             } else {
                 isConnectionHealthy = true
+                connectionNeedsAutomationPermission = false
                 connectionStatusText = "Connected (\(library.count) library tracks available)."
             }
         } catch {
             isConnectionHealthy = false
+            connectionNeedsAutomationPermission = isAutomationDenied(error)
             connectionStatusText = "Music connection check failed: \(error.localizedDescription)"
         }
     }
@@ -148,6 +158,16 @@ final class ImportSessionViewModel: ObservableObject {
     func openSystemSettingsForMediaAndMusic() {
         if let privacyURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Media"),
            NSWorkspace.shared.open(privacyURL) {
+            return
+        }
+        if let settingsURL = URL(string: "x-apple.systempreferences:com.apple.Settings.PrivacySecurity.extension") {
+            _ = NSWorkspace.shared.open(settingsURL)
+        }
+    }
+
+    func openSystemSettingsForAutomation() {
+        if let automationURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation"),
+           NSWorkspace.shared.open(automationURL) {
             return
         }
         if let settingsURL = URL(string: "x-apple.systempreferences:com.apple.Settings.PrivacySecurity.extension") {
@@ -172,7 +192,13 @@ final class ImportSessionViewModel: ObservableObject {
         case .restricted:
             return "Apple Music access is restricted for this account or device."
         case .notDetermined:
-            return "Apple Music access has not been granted."
+            return "Apple Music access has not been granted yet. Click Check Connection to request access."
         }
+    }
+
+    private func isAutomationDenied(_ error: Error) -> Bool {
+        let lowered = error.localizedDescription.lowercased()
+        return lowered.contains("not authorized to send apple events")
+            || lowered.contains("automation")
     }
 }

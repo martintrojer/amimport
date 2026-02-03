@@ -70,6 +70,21 @@ final class ImportToExportFlowTests: XCTestCase {
         XCTAssertTrue(importViewModel.connectionStatusText.contains("denied"))
         XCTAssertTrue(importViewModel.shouldShowOpenSettingsShortcut)
     }
+
+    @MainActor
+    func test_refreshConnectionStatus_flagsAutomationPermissionFailure() async {
+        let importViewModel = ImportSessionViewModel(
+            authorizer: AuthorizedAuthorizer(),
+            snapshotter: FailingSnapshotter(
+                error: StubFailure(message: "Not authorized to send Apple events to Music.")
+            )
+        )
+
+        await importViewModel.refreshConnectionStatus(requestIfNeeded: true)
+
+        XCTAssertFalse(importViewModel.isConnectionHealthy)
+        XCTAssertTrue(importViewModel.connectionNeedsAutomationPermission)
+    }
 }
 
 private struct AuthorizedAuthorizer: MusicAuthorizing {
@@ -96,6 +111,20 @@ private struct StubSnapshotter: LibrarySnapshotting {
         progress(libraryTracks.count)
         return libraryTracks
     }
+}
+
+private struct FailingSnapshotter: LibrarySnapshotting {
+    let error: Error
+
+    @MainActor
+    func fetchAll(progress: @escaping (Int) -> Void) async throws -> [LibraryTrack] {
+        throw error
+    }
+}
+
+private struct StubFailure: LocalizedError {
+    let message: String
+    var errorDescription: String? { message }
 }
 
 private final class CapturingExporter: MusicAppControlling {

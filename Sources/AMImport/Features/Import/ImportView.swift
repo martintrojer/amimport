@@ -39,12 +39,17 @@ struct ImportView: View {
                     Spacer()
                     Button("Check Connection") {
                         Task { @MainActor in
-                            await viewModel.refreshConnectionStatus()
+                            await viewModel.refreshConnectionStatus(requestIfNeeded: true)
                         }
                     }
                     if viewModel.shouldShowOpenSettingsShortcut {
                         Button("Open System Settings") {
                             viewModel.openSystemSettingsForMediaAndMusic()
+                        }
+                    }
+                    if viewModel.connectionNeedsAutomationPermission {
+                        Button("Open Automation Settings") {
+                            viewModel.openSystemSettingsForAutomation()
                         }
                     }
                 }
@@ -104,7 +109,7 @@ struct ImportView: View {
             onSessionUpdated?(session)
         }
         .task {
-            await viewModel.refreshConnectionStatus()
+            await viewModel.refreshConnectionStatus(requestIfNeeded: false)
         }
     }
 

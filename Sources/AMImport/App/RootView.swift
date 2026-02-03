@@ -77,20 +77,30 @@ private enum AppSection: String, CaseIterable, Identifiable {
 private struct MusicAppLibraryProvider: LibrarySongProviding {
     @MainActor
     func fetchPage(offset: Int, limit: Int) async throws -> [LibraryTrack] {
-        guard offset == 0 else {
-            return []
-        }
-        let allTracks = try fetchAllTracksWithAppleScript()
-        return Array(allTracks.prefix(limit))
+        try await Task.detached(priority: .userInitiated) {
+            try Self.fetchPageWithAppleScript(offset: offset, limit: limit)
+        }.value
     }
 
-    private func fetchAllTracksWithAppleScript() throws -> [LibraryTrack] {
+    private static func fetchPageWithAppleScript(offset: Int, limit: Int) throws -> [LibraryTrack] {
         let separator = "\u{1F}"
         let escapedSeparator = separator.replacingOccurrences(of: "\\", with: "\\\\")
+        let startIndex = offset + 1
         let script = """
         tell application "Music"
             set outputLines to {}
-            repeat with t in tracks of library playlist 1
+            set allTracks to tracks of library playlist 1
+            set totalTracks to count of allTracks
+            if \(startIndex) > totalTracks then
+                return ""
+            end if
+            set endIndex to \(startIndex) + \(limit) - 1
+            if endIndex > totalTracks then
+                set endIndex to totalTracks
+            end if
+
+            repeat with idx from \(startIndex) to endIndex
+                set t to item idx of allTracks
                 set trackID to persistent ID of t as string
                 set trackName to ""
                 set trackArtist to ""
@@ -123,6 +133,9 @@ private struct MusicAppLibraryProvider: LibrarySongProviding {
         }
         guard let output = appleScript.executeAndReturnError(&errorInfo).stringValue else {
             let message = (errorInfo?[NSAppleScript.errorMessage] as? String) ?? "Unknown AppleScript error."
+            if isAutomationDenied(message: message) {
+                throw MusicAppLibraryProviderError.automationPermissionDenied
+            }
             throw MusicAppLibraryProviderError.executionFailed(message)
         }
 
@@ -149,16 +162,26 @@ private struct MusicAppLibraryProvider: LibrarySongProviding {
                 )
             }
     }
+
+    private static func isAutomationDenied(message: String) -> Bool {
+        let lowered = message.lowercased()
+        return lowered.contains("not authorized to send apple events")
+            || lowered.contains("not permitted to send apple events")
+            || lowered.contains("automation")
+    }
 }
 
 private enum MusicAppLibraryProviderError: LocalizedError {
     case compilationFailed
+    case automationPermissionDenied
     case executionFailed(String)
 
     var errorDescription: String? {
         switch self {
         case .compilationFailed:
             return "Unable to compile Music library query."
+        case .automationPermissionDenied:
+            return "AMImport is not allowed to control Music. Enable AMImport under System Settings > Privacy & Security > Automation > Music."
         case let .executionFailed(message):
             return "Unable to read tracks from Music app: \(message)"
         }

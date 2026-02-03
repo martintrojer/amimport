@@ -51,17 +51,17 @@ final class ImportSessionViewModel: ObservableObject {
     }
 
     private let authorizer: MusicAuthorizing
-    private let snapshotter: LibrarySnapshotting
-    private let matcher: MatcherPipeline
+    private let resolver: TrackResolving
+    private let snapshotter: LibrarySnapshotting?
 
     init(
         authorizer: MusicAuthorizing,
-        snapshotter: LibrarySnapshotting,
-        matcher: MatcherPipeline = MatcherPipeline()
+        resolver: TrackResolving,
+        snapshotter: LibrarySnapshotting? = nil
     ) {
         self.authorizer = authorizer
+        self.resolver = resolver
         self.snapshotter = snapshotter
-        self.matcher = matcher
     }
 
     func runImport(
@@ -81,30 +81,14 @@ final class ImportSessionViewModel: ObservableObject {
                 return
             }
 
-            state = .loadingLibrary
-            let library = try await snapshotter.fetchAll { _ in }
-            guard !library.isEmpty else {
-                state = .failed("Connected to Music, but no library tracks were found. Open the Music app and confirm your library is populated and sync is enabled.")
-                return
-            }
+            state = .matching(progress: 0, total: rows.count)
 
             var snapshots: [MatchDecisionSnapshot] = []
             snapshots.reserveCapacity(rows.count)
 
             for (index, row) in rows.enumerated() {
-                let decision = matcher.match(row: row, in: library, options: options)
-                snapshots.append(
-                    MatchDecisionSnapshot(
-                        rowID: row.id,
-                        status: decision.result.status,
-                        selectedTrackID: decision.result.selectedTrack?.id,
-                        catalogSongID: nil,
-                        librarySongID: nil,
-                        candidateTrackIDs: decision.result.candidates.map(\.track.id),
-                        confidence: decision.confidence,
-                        rationale: decision.rationale
-                    )
-                )
+                let snapshot = try await resolver.resolve(row: row, options: options)
+                snapshots.append(snapshot)
                 state = .matching(progress: index + 1, total: rows.count)
             }
 
@@ -141,17 +125,32 @@ final class ImportSessionViewModel: ObservableObject {
             return
         }
 
-        do {
-            let library = try await snapshotter.fetchAll { _ in }
-            if library.isEmpty {
+        if let snapshotter {
+            do {
+                let library = try await snapshotter.fetchAll { _ in }
+                if library.isEmpty {
+                    isConnectionHealthy = false
+                    connectionNeedsAutomationPermission = false
+                    connectionStatusText = "Connected, but no library tracks were found."
+                } else {
+                    isConnectionHealthy = true
+                    connectionNeedsAutomationPermission = false
+                    connectionStatusText = "Connected (\(library.count) library tracks available)."
+                }
+            } catch {
                 isConnectionHealthy = false
-                connectionNeedsAutomationPermission = false
-                connectionStatusText = "Connected, but no library tracks were found."
-            } else {
-                isConnectionHealthy = true
-                connectionNeedsAutomationPermission = false
-                connectionStatusText = "Connected (\(library.count) library tracks available)."
+                connectionNeedsAutomationPermission = isAutomationDenied(error)
+                connectionStatusText = "Music connection check failed: \(error.localizedDescription)"
             }
+            return
+        }
+
+        do {
+            let probe = ImportTrackRow(sourceLine: 0, title: "Yesterday", artist: "The Beatles")
+            _ = try await resolver.resolve(row: probe, options: .default)
+            isConnectionHealthy = true
+            connectionNeedsAutomationPermission = false
+            connectionStatusText = "Connected to Apple Music."
         } catch {
             isConnectionHealthy = false
             connectionNeedsAutomationPermission = isAutomationDenied(error)

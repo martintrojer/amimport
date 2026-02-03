@@ -36,6 +36,7 @@ final class ImportToExportFlowTests: XCTestCase {
 
         let importViewModel = ImportSessionViewModel(
             authorizer: AuthorizedAuthorizer(),
+            resolver: StubResolver(libraryTracks: libraryTracks),
             snapshotter: StubSnapshotter(libraryTracks: libraryTracks)
         )
 
@@ -64,7 +65,7 @@ final class ImportToExportFlowTests: XCTestCase {
 
         let importViewModel = ImportSessionViewModel(
             authorizer: AuthorizedAuthorizer(),
-            snapshotter: StubSnapshotter(libraryTracks: [])
+            resolver: ThrowingResolver(error: StubFailure(message: "Search unavailable."))
         )
 
         await importViewModel.runImport(rawInput: rawCSV, format: .csv, options: .default)
@@ -73,13 +74,14 @@ final class ImportToExportFlowTests: XCTestCase {
             XCTFail("Expected failed state")
             return
         }
-        XCTAssertTrue(message.contains("no library tracks"))
+        XCTAssertTrue(message.contains("Search unavailable"))
     }
 
     @MainActor
     func test_refreshConnectionStatus_reportsPermissionFailure() async {
         let importViewModel = ImportSessionViewModel(
             authorizer: DeniedAuthorizer(),
+            resolver: StubResolver(libraryTracks: []),
             snapshotter: StubSnapshotter(libraryTracks: [])
         )
 
@@ -94,6 +96,7 @@ final class ImportToExportFlowTests: XCTestCase {
     func test_refreshConnectionStatus_flagsAutomationPermissionFailure() async {
         let importViewModel = ImportSessionViewModel(
             authorizer: AuthorizedAuthorizer(),
+            resolver: StubResolver(libraryTracks: []),
             snapshotter: FailingSnapshotter(
                 error: StubFailure(message: "Not authorized to send Apple events to Music.")
             )
@@ -103,6 +106,35 @@ final class ImportToExportFlowTests: XCTestCase {
 
         XCTAssertFalse(importViewModel.isConnectionHealthy)
         XCTAssertTrue(importViewModel.connectionNeedsAutomationPermission)
+    }
+}
+
+private struct StubResolver: TrackResolving {
+    let libraryTracks: [LibraryTrack]
+    private let matcher = MatcherPipeline()
+
+    @MainActor
+    func resolve(row: ImportTrackRow, options: MatchingOptions) async throws -> MatchDecisionSnapshot {
+        let decision = matcher.match(row: row, in: libraryTracks, options: options)
+        return MatchDecisionSnapshot(
+            rowID: row.id,
+            status: decision.result.status,
+            selectedTrackID: decision.result.selectedTrack?.id,
+            catalogSongID: decision.result.selectedTrack?.id,
+            librarySongID: decision.result.selectedTrack?.id,
+            candidateTrackIDs: decision.result.candidates.map(\.track.id),
+            confidence: decision.confidence,
+            rationale: decision.rationale
+        )
+    }
+}
+
+private struct ThrowingResolver: TrackResolving {
+    let error: Error
+
+    @MainActor
+    func resolve(row: ImportTrackRow, options: MatchingOptions) async throws -> MatchDecisionSnapshot {
+        throw error
     }
 }
 

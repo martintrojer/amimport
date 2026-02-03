@@ -558,14 +558,14 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project AMI
 - [x] Task 10: Remove AppleScript library provider wiring
 - [x] Task 11: Add resolve candidate previews
 - [x] Task 12: Add preview mapping tests
-- [ ] Task 13: Add MusicKit exporter abstraction
-- [ ] Task 14: Implement MusicKit playlist export
-- [ ] Task 15: Implement MusicKit enqueue + autoplay
-- [ ] Task 16: Switch export VM wiring to MusicKit
-- [ ] Task 17: Remove AppleScript bridge runtime path
-- [ ] Task 18: Remove Automation permission UX
-- [ ] Task 19: Add skip-and-continue integration test
-- [ ] Task 20: Final docs + verification
+- [x] Task 13: Add MusicKit exporter abstraction
+- [x] Task 14: Implement MusicKit playlist export
+- [x] Task 15: Implement MusicKit enqueue + autoplay
+- [x] Task 16: Switch export VM wiring to MusicKit
+- [x] Task 17: Remove AppleScript bridge runtime path
+- [x] Task 18: Remove Automation permission UX
+- [x] Task 19: Add skip-and-continue integration test
+- [x] Task 20: Final docs + verification
 
 ## Notes
 - Execute in order; each task is intentionally small and reversible.

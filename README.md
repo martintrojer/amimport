@@ -17,10 +17,11 @@ AMImport is a macOS app for importing song lists and matching them to your Apple
 - `exact`: exact title+artist string equality.
 - `normalizedExact`: punctuation/case/spacing normalized equality.
 - `fuzzy`: edit-distance similarity scoring over normalized title+artist.
+- Matching runs library-first and falls back to Apple Music catalog when needed.
 
 ## Permissions and Capabilities
 
-- `NSAppleMusicUsageDescription`: allows reading the Apple Music library and writing outputs.
+- `NSAppleMusicUsageDescription`: allows Media & Apple Music access for search and playback.
 - `NSDocumentsFolderUsageDescription`: allows importing local files (CSV first).
 
 ## App Sandbox / Signing Notes
@@ -31,11 +32,11 @@ AMImport is a macOS app for importing song lists and matching them to your Apple
 
 ## Output Modes
 
-- New playlist: creates/uses a playlist in Music and adds resolved tracks.
-- Enqueue tracks: sends resolved tracks to Music playback flow.
+- New playlist: uses MusicKit export flow (macOS currently limits direct playlist creation from MusicKit).
+- Enqueue tracks: resolves catalog songs, queues playable tracks, autoplays, and skips unavailable tracks.
 
 ## Troubleshooting
 
 - If import fails immediately, verify Apple Music permission is granted.
 - If rows stay unmatched, lower the minimum score or enable fuzzy matching.
-- If export fails, ensure the Music app is installed/running and script permissions are allowed.
+- If enqueue exports skip tracks, those catalog items are unavailable in your storefront/library context.

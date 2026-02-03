@@ -47,11 +47,6 @@ struct ImportView: View {
                             viewModel.openSystemSettingsForMediaAndMusic()
                         }
                     }
-                    if viewModel.connectionNeedsAutomationPermission {
-                        Button("Open Automation Settings") {
-                            viewModel.openSystemSettingsForAutomation()
-                        }
-                    }
                 }
             }
 
@@ -119,8 +114,6 @@ struct ImportView: View {
             return "Idle"
         case .requestingPermission:
             return "Requesting Apple Music permission"
-        case .loadingLibrary:
-            return "Loading library"
         case let .matching(progress, total):
             return "Matching \(progress)/\(total)"
         case .completed:

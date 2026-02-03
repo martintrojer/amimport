@@ -105,19 +105,17 @@ final class ImportToExportFlowTests: XCTestCase {
     }
 
     @MainActor
-    func test_refreshConnectionStatus_flagsAutomationPermissionFailure() async {
+    func test_refreshConnectionStatus_reportsConnectionFailure() async {
         let importViewModel = ImportSessionViewModel(
             authorizer: AuthorizedAuthorizer(),
             resolver: StubResolver(libraryTracks: []),
-            snapshotter: FailingSnapshotter(
-                error: StubFailure(message: "Not authorized to send Apple events to Music.")
-            )
+            snapshotter: FailingSnapshotter(error: StubFailure(message: "Connection failed."))
         )
 
         await importViewModel.refreshConnectionStatus(requestIfNeeded: true)
 
         XCTAssertFalse(importViewModel.isConnectionHealthy)
-        XCTAssertTrue(importViewModel.connectionNeedsAutomationPermission)
+        XCTAssertTrue(importViewModel.connectionStatusText.contains("Connection failed"))
     }
 
     func test_resolveRows_includeCandidatePreviewFields() {
@@ -198,6 +196,68 @@ final class ImportToExportFlowTests: XCTestCase {
         XCTAssertNil(rows[0].candidates.first?.album)
         XCTAssertNil(rows[0].candidates.first?.artworkURL)
         XCTAssertNil(rows[0].candidates.first?.durationSeconds)
+    }
+
+    @MainActor
+    func test_export_enqueue_skipsUnavailableTracksAndContinues() async {
+        let session = ImportSession(
+            format: .csv,
+            options: .default,
+            importedRows: [
+                ImportTrackRow(sourceLine: 1, title: "A", artist: "A"),
+                ImportTrackRow(sourceLine: 2, title: "B", artist: "B"),
+                ImportTrackRow(sourceLine: 3, title: "C", artist: "C")
+            ],
+            decisions: [
+                MatchDecisionSnapshot(
+                    rowID: "row-1",
+                    status: .autoMatched,
+                    selectedTrackID: "lib-1",
+                    catalogSongID: "cat-1",
+                    librarySongID: "lib-1",
+                    candidateTrackIDs: ["lib-1"],
+                    candidates: [],
+                    confidence: 1.0,
+                    rationale: "ok"
+                ),
+                MatchDecisionSnapshot(
+                    rowID: "row-2",
+                    status: .autoMatched,
+                    selectedTrackID: "lib-2",
+                    catalogSongID: "cat-2",
+                    librarySongID: "lib-2",
+                    candidateTrackIDs: ["lib-2"],
+                    candidates: [],
+                    confidence: 1.0,
+                    rationale: "ok"
+                ),
+                MatchDecisionSnapshot(
+                    rowID: "row-3",
+                    status: .autoMatched,
+                    selectedTrackID: "lib-3",
+                    catalogSongID: "cat-3",
+                    librarySongID: "lib-3",
+                    candidateTrackIDs: ["lib-3"],
+                    candidates: [],
+                    confidence: 1.0,
+                    rationale: "ok"
+                )
+            ],
+            summary: ImportSummary(totalRows: 3, autoMatched: 3, unmatched: 0),
+            createdAt: Date()
+        )
+
+        let exporter = PartialSuccessExporter(
+            summary: ExportExecutionSummary(requested: 3, succeeded: 2, skipped: 1)
+        )
+        let viewModel = ExportViewModel(exporter: exporter)
+        viewModel.mode = .enqueue
+
+        await viewModel.export(session: session)
+
+        XCTAssertEqual(exporter.lastEnqueueIDs, ["cat-1", "cat-2", "cat-3"])
+        XCTAssertTrue(viewModel.statusMessage.contains("2/3"))
+        XCTAssertTrue(viewModel.statusMessage.contains("Skipped 1"))
     }
 }
 
@@ -282,16 +342,38 @@ private struct StubFailure: LocalizedError {
     var errorDescription: String? { message }
 }
 
-private final class CapturingExporter: MusicAppControlling {
+private final class CapturingExporter: MusicKitExporting {
     var enqueuedTrackIDs: [String] = []
 
     @MainActor
-    func createPlaylist(name: String, trackIDs: [String]) async throws {
-        enqueuedTrackIDs = trackIDs
+    func createPlaylist(name: String, catalogSongIDs: [String]) async throws -> ExportExecutionSummary {
+        enqueuedTrackIDs = catalogSongIDs
+        return ExportExecutionSummary(requested: catalogSongIDs.count, succeeded: catalogSongIDs.count, skipped: 0)
     }
 
     @MainActor
-    func enqueue(trackIDs: [String]) async throws {
-        enqueuedTrackIDs = trackIDs
+    func enqueueAndPlay(catalogSongIDs: [String]) async throws -> ExportExecutionSummary {
+        enqueuedTrackIDs = catalogSongIDs
+        return ExportExecutionSummary(requested: catalogSongIDs.count, succeeded: catalogSongIDs.count, skipped: 0)
+    }
+}
+
+private final class PartialSuccessExporter: MusicKitExporting {
+    let summary: ExportExecutionSummary
+    var lastEnqueueIDs: [String] = []
+
+    init(summary: ExportExecutionSummary) {
+        self.summary = summary
+    }
+
+    @MainActor
+    func createPlaylist(name: String, catalogSongIDs: [String]) async throws -> ExportExecutionSummary {
+        summary
+    }
+
+    @MainActor
+    func enqueueAndPlay(catalogSongIDs: [String]) async throws -> ExportExecutionSummary {
+        lastEnqueueIDs = catalogSongIDs
+        return summary
     }
 }

@@ -72,11 +72,11 @@
 		A00000000000000000000117 /* Tests/AMImportTests/Features/ImportToExportFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Features/ImportToExportFlowTests.swift; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000118 /* AMImport/Support/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = AMImport/Support/Info.plist; sourceTree = SOURCE_ROOT; };
 		A00000000000000000000119 /* Sources/AMImport/Services/MusicKitClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Services/MusicKitClient.swift; sourceTree = SOURCE_ROOT; };
-		A00000000000000000000120 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		A0000000000000000000011A /* Tests/AMImportTests/Services/MusicKitClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Services/MusicKitClientTests.swift; sourceTree = SOURCE_ROOT; };
 		A0000000000000000000011B /* Sources/AMImport/Services/TrackResolutionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Services/TrackResolutionService.swift; sourceTree = SOURCE_ROOT; };
 		A0000000000000000000011C /* Tests/AMImportTests/Services/TrackResolutionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/AMImportTests/Services/TrackResolutionServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		A0000000000000000000011D /* Sources/AMImport/Export/MusicKitExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/AMImport/Export/MusicKitExporter.swift; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000120 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		A00000000000000000000130 /* AMImport.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AMImport.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A00000000000000000000131 /* AMImportTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AMImportTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -495,23 +495,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = RH5NAK993H;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AMImport/Support/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.AMImport;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.trojer.AMImport;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -522,22 +525,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = RH5NAK993H;
 				ENABLE_MODULE_VERIFIER = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AMImport/Support/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.AMImport;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.trojer.AMImport;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

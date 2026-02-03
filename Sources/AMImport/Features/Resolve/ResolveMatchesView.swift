@@ -10,10 +10,12 @@ struct ResolveRow: Identifiable, Equatable {
 }
 
 struct ResolveMatchesView: View {
+    @Binding var session: ImportSession?
     @State private var unresolvedRows: [ResolveRow]
 
-    init(session: ImportSession) {
-        _unresolvedRows = State(initialValue: Self.buildRows(from: session))
+    init(session: Binding<ImportSession?>) {
+        _session = session
+        _unresolvedRows = State(initialValue: Self.buildRows(from: session.wrappedValue))
     }
 
     var body: some View {
@@ -48,9 +50,13 @@ struct ResolveMatchesView: View {
             }
         }
         .padding(16)
+        .onChange(of: session) { _, newSession in
+            unresolvedRows = Self.buildRows(from: newSession)
+        }
     }
 
-    private static func buildRows(from session: ImportSession) -> [ResolveRow] {
+    private static func buildRows(from session: ImportSession?) -> [ResolveRow] {
+        guard let session else { return [] }
         let sourceByID = Dictionary(uniqueKeysWithValues: session.importedRows.map { ($0.id, $0) })
 
         return session.decisions.compactMap { snapshot in
@@ -78,6 +84,7 @@ struct ResolveMatchesView: View {
 
         unresolvedRows[index].selectedTrackID = first
         unresolvedRows[index].status = .userMatched
+        syncSession(rowID: rowID, status: .userMatched, selectedTrackID: first)
     }
 
     private func skip(rowID: String) {
@@ -86,5 +93,36 @@ struct ResolveMatchesView: View {
         }
 
         unresolvedRows[index].status = .skipped
+        syncSession(rowID: rowID, status: .skipped, selectedTrackID: nil)
+    }
+
+    private func syncSession(rowID: String, status: MatchStatus, selectedTrackID: String?) {
+        guard var current = session else { return }
+
+        let updatedDecisions = current.decisions.map { snapshot -> MatchDecisionSnapshot in
+            guard snapshot.rowID == rowID else { return snapshot }
+            return MatchDecisionSnapshot(
+                rowID: snapshot.rowID,
+                status: status,
+                selectedTrackID: selectedTrackID,
+                candidateTrackIDs: snapshot.candidateTrackIDs,
+                confidence: snapshot.confidence,
+                rationale: snapshot.rationale
+            )
+        }
+
+        let autoMatched = updatedDecisions.filter { $0.status == .autoMatched || $0.status == .userMatched }.count
+        let unmatched = updatedDecisions.filter { $0.status == .unmatched }.count
+
+        current = ImportSession(
+            format: current.format,
+            options: current.options,
+            importedRows: current.importedRows,
+            decisions: updatedDecisions,
+            summary: ImportSummary(totalRows: current.summary.totalRows, autoMatched: autoMatched, unmatched: unmatched),
+            createdAt: current.createdAt
+        )
+
+        session = current
     }
 }

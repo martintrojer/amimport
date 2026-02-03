@@ -2,7 +2,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ImportView: View {
-    @StateObject private var viewModel: ImportSessionViewModel
+    @ObservedObject var viewModel: ImportSessionViewModel
+    var onSessionUpdated: ((ImportSession?) -> Void)?
 
     @State private var showImporter = false
     @State private var minimumScore = MatchingOptions.default.minimumScore
@@ -10,10 +11,6 @@ struct ImportView: View {
     @State private var useExact = true
     @State private var useNormalized = true
     @State private var useFuzzy = true
-
-    init(viewModel: @autoclosure @escaping () -> ImportSessionViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel())
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -82,6 +79,9 @@ struct ImportView: View {
             case .failure:
                 break
             }
+        }
+        .onChange(of: viewModel.session) { _, session in
+            onSessionUpdated?(session)
         }
     }
 

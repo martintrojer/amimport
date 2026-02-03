@@ -105,6 +105,8 @@ struct ResolveMatchesView: View {
                 rowID: snapshot.rowID,
                 status: status,
                 selectedTrackID: selectedTrackID,
+                catalogSongID: snapshot.catalogSongID,
+                librarySongID: snapshot.librarySongID,
                 candidateTrackIDs: snapshot.candidateTrackIDs,
                 confidence: snapshot.confidence,
                 rationale: snapshot.rationale

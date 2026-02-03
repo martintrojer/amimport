@@ -30,6 +30,8 @@ struct MatchDecisionSnapshot: Codable, Equatable {
     let rowID: String
     let status: MatchStatus
     let selectedTrackID: String?
+    let catalogSongID: String?
+    let librarySongID: String?
     let candidateTrackIDs: [String]
     let confidence: Double
     let rationale: String
@@ -96,6 +98,8 @@ final class ImportSessionViewModel: ObservableObject {
                         rowID: row.id,
                         status: decision.result.status,
                         selectedTrackID: decision.result.selectedTrack?.id,
+                        catalogSongID: nil,
+                        librarySongID: nil,
                         candidateTrackIDs: decision.result.candidates.map(\.track.id),
                         confidence: decision.confidence,
                         rationale: decision.rationale
